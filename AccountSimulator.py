@@ -37,9 +37,9 @@ def hash_this(n):
 
 def get_credentials():
     username_ = str(input("Enter username: "))
-    username_ = username_.rstrip()
+    username_ = username_.strip()
     password_ = str(input("Enter password: "))
-    password_ = password_.rstrip()
+    password_ = password_.strip()
     return [username_, password_]
 
 
