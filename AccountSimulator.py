@@ -13,34 +13,22 @@ cur.execute("""
 
 
 def create_account(username, password):
-    username = hash_this(username)
-    password = hash_this(password)
     with conn:
         cur.execute("INSERT INTO users (Username, Password) VALUES (?, ?)",
-                    (username, password))
+                    (hash_this(username), hash_this(password)))
 
 
 def username_checker(desired_username):
-    statement = cur.execute("SELECT Username FROM users WHERE Username IS ?",
-                            (hash_this(desired_username),)).fetchone()
-    if statement is None:
-        return True
-    else:
-        return False
+    return cur.execute("SELECT Username FROM users WHERE Username IS ?",
+                       (hash_this(desired_username),)).fetchone() is None
 
 
 def hash_this(n):
-    m = hashlib.sha256()
-    m.update(n.encode("utf-8"))
-    return m.hexdigest()
+    return hashlib.sha256(n.encode("utf-8")).hexdigest()
 
 
-def get_credentials():
-    username_ = str(input("Enter username: "))
-    username_ = username_.strip()
-    password_ = str(input("Enter password: "))
-    password_ = password_.strip()
-    return [username_, password_]
+def get_credentials():  # strip() removes whitespaces only at the beginning and end
+    return [str(input("Enter username: ")).strip(), str(input("Enter password: ")).strip()]
 
 
 print("Welcome to account simulator!")
@@ -53,9 +41,9 @@ while True:
         credentials = get_credentials()
         if username_checker(credentials[0]):
             create_account(credentials[0], credentials[1])
-            print("Account successfully created!")
+            print("Account successfully created!\n")
         else:
-            print("Error! Username already exists!")
+            print("Error! Username already exists!\n")
     elif choice == "2":
         credentials = get_credentials()
         hash_username = hashlib.sha256(credentials[0].encode("utf-8")).hexdigest()
@@ -66,15 +54,15 @@ while True:
                     0] != hash_username \
                         or cur.execute("SELECT password FROM users where password IS ?",
                                        (hash_password,)).fetchone()[0] != hash_password:
-                    print("Username or password is wrong!")
+                    print("Username or password is wrong!\n")
             except TypeError:
-                print("Username or password is wrong!")
+                print("Username or password is wrong!\n")
             else:
                 print("Success!")
     elif choice == "3":
         print("Bye!")
         break
     else:
-        print("Invalid choice, try again")
+        print("Invalid choice, try again\n")
 
 conn.close()
